@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Queue;
 
 public class VehicleWriter {
+
     public void saveVehicles(String fileName, Queue<Vehicle> vehiclesQueue) {
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName))) {
             for (Vehicle vehicle : vehiclesQueue) {
@@ -20,7 +21,6 @@ public class VehicleWriter {
             }
         } catch (IOException e) {
             System.err.println("Nie można odnaleźć pliku " + fileName);
-            System.exit(0);
         }
     }
 }

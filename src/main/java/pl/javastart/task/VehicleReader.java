@@ -4,8 +4,14 @@ import java.io.*;
 import java.util.Queue;
 
 public class VehicleReader {
+    private boolean fileExist;
+
+    public boolean isFileExist() {
+        return fileExist;
+    }
 
     public void readVehicles(String fileName, Queue<Vehicle> vehiclesQueue) {
+        fileExist = true;
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
@@ -19,8 +25,8 @@ public class VehicleReader {
                 vehiclesQueue.add(new Vehicle(type, brand, model, year, mileage, vinNumber));
             }
         } catch (IOException e) {
+            fileExist = false;
             System.err.println("Nie można odnaleźć pliku " + fileName);
-            System.exit(0);
         }
     }
 }

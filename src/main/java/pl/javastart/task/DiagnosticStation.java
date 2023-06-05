@@ -8,18 +8,20 @@ public class DiagnosticStation {
     private static final int EXIT = 0;
     private static final int CREATE_VEHICLE = 1;
     private static final int GET_NEW_VEHICLE = 2;
-    private final String vehiclesTxt = "src/main/java/resources/vehicles.txt";
+    private final String vehiclesTxt = "src/main/resources/vehicles.txt";
     private final Queue<Vehicle> vehiclesQueue = new LinkedList<>();
 
     void mainLoop() {
         int option;
         VehicleReader vehicleReader = new VehicleReader();
         vehicleReader.readVehicles(vehiclesTxt, vehiclesQueue);
-        do {
-            printOptions();
-            option = readOption();
-            evaluateOption(option);
-        } while (option != EXIT);
+        if (vehicleReader.isFileExist()) {
+            do {
+                printOptions();
+                option = readOption();
+                evaluateOption(option);
+            } while (option != EXIT);
+        }
     }
 
     private void printOptions() {
@@ -39,6 +41,7 @@ public class DiagnosticStation {
 
     private void evaluateOption(int option) {
         VehicleWriter vehicleWriter = new VehicleWriter();
+
         if (option == EXIT) {
             saveAndExit(vehicleWriter);
         } else if (option == CREATE_VEHICLE) {
