@@ -1,5 +1,6 @@
 package pl.javastart.task;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
@@ -9,18 +10,21 @@ public class DiagnosticStation {
     private static final int CREATE_VEHICLE = 1;
     private static final int GET_NEW_VEHICLE = 2;
     private final String vehiclesTxt = "src/main/resources/vehicles.txt";
-    private final Queue<Vehicle> vehiclesQueue = new LinkedList<>();
+    private Queue<Vehicle> vehiclesQueue = new LinkedList<>();
 
     void mainLoop() {
-        int option;
+
         VehicleReader vehicleReader = new VehicleReader();
-        vehicleReader.readVehicles(vehiclesTxt, vehiclesQueue);
-        if (vehicleReader.isFileExist()) {
+        try {
+            vehiclesQueue = vehicleReader.readVehicles(vehiclesTxt);
+            boolean exit;
             do {
                 printOptions();
-                option = readOption();
-                evaluateOption(option);
-            } while (option != EXIT);
+                int option = readOption();
+                exit = evaluateOption(option);
+            } while (!exit);
+        } catch (IOException e) {
+            System.err.println("Nie można odnaleźć pliku " + vehiclesTxt);
         }
     }
 
@@ -39,20 +43,18 @@ public class DiagnosticStation {
         return option;
     }
 
-    private void evaluateOption(int option) {
-        VehicleWriter vehicleWriter = new VehicleWriter();
-
+    private boolean evaluateOption(int option) {
         if (option == EXIT) {
-            saveAndExit(vehicleWriter);
+            saveAndExit();
+            return true;
         } else if (option == CREATE_VEHICLE) {
             Vehicle vehicle = makeNewVehicle();
             vehiclesQueue.offer(vehicle);
         } else if (option == GET_NEW_VEHICLE) {
             if (vehiclesQueue.isEmpty()) {
                 System.out.println("Brak pojazdów w kolejce");
-                vehicleWriter.saveVehicles(vehiclesTxt, vehiclesQueue);
-                System.out.println("Zamykam program");
-                System.exit(EXIT);
+                saveAndExit();
+                return true;
             } else {
                 System.out.println("Pojazd: ");
                 Vehicle peek = vehiclesQueue.poll();
@@ -61,12 +63,19 @@ public class DiagnosticStation {
         } else {
             System.err.println("Nieznana opcja");
         }
+        return false;
     }
 
-    private void saveAndExit(VehicleWriter vehicleWriter) {
-        vehicleWriter.saveVehicles(vehiclesTxt, vehiclesQueue);
-        System.out.println("Zapis pojazdów");
-        System.out.println("Zamykam program");
+    private void saveAndExit() {
+        try {
+            VehicleWriter vehicleWriter = new VehicleWriter();
+            vehicleWriter.saveVehicles(vehiclesTxt, vehiclesQueue);
+            System.out.println("Zapis pojazdów");
+            System.out.println("Zamykam program");
+        } catch (IOException e) {
+            System.err.println("Nie można odnaleźć pliku " + vehiclesTxt);
+        }
+
     }
 
     private Vehicle makeNewVehicle() {

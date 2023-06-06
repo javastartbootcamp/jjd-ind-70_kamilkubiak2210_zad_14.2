@@ -1,17 +1,13 @@
 package pl.javastart.task;
 
 import java.io.*;
+import java.util.LinkedList;
 import java.util.Queue;
 
 public class VehicleReader {
-    private boolean fileExist;
 
-    public boolean isFileExist() {
-        return fileExist;
-    }
-
-    public void readVehicles(String fileName, Queue<Vehicle> vehiclesQueue) {
-        fileExist = true;
+    public Queue<Vehicle> readVehicles(String fileName) throws IOException {
+        Queue<Vehicle> vehiclesQueue = new LinkedList<>();
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
@@ -24,9 +20,7 @@ public class VehicleReader {
                 String vinNumber = strings[5];
                 vehiclesQueue.add(new Vehicle(type, brand, model, year, mileage, vinNumber));
             }
-        } catch (IOException e) {
-            fileExist = false;
-            System.err.println("Nie można odnaleźć pliku " + fileName);
         }
+        return vehiclesQueue;
     }
 }
